@@ -44,4 +44,26 @@ describe("PermissionGate", () => {
       "/consents"
     );
   });
+    it("preserves locked-state rendering when children are empty", () => {
+    mockUseVault.mockReturnValue({
+      isVaultUnlocked: false,
+      vaultOwnerToken: null,
+    });
+
+    render(
+      <PermissionGate permission="portfolio_valuation">
+        {null}
+      </PermissionGate>
+    );
+
+    expect(
+      screen.getByText("Vault permission required")
+    ).toBeTruthy();
+
+    expect(
+      screen.getByRole("link", {
+        name: "Review permissions",
+      })
+    ).toBeTruthy();
+  });
 });
