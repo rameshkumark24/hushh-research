@@ -133,4 +133,27 @@ describe("VaultMethodService.changePassphrase", () => {
     expect(result.primaryMethod).toBe("passphrase");
     expect(result.passphraseUpdated).toBe(true);
   });
+    it("preserves recovery material when passphrase changes", async () => {
+    await VaultMethodService.changePassphrase({
+      userId: "uid-1",
+      currentVaultKey:
+        "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef",
+      newPassphrase: "new-passphrase-123",
+    });
+
+    expect(upsertWrapperMock).toHaveBeenCalledWith(
+      expect.objectContaining({
+        wrapper: expect.objectContaining({
+          method: "passphrase",
+          wrapperId: "default",
+        }),
+      })
+    );
+
+    const latestVaultState = await getVaultStateMock.mock.results[0]?.value;
+
+    expect(latestVaultState?.recoveryEncryptedVaultKey).toBe("r1");
+    expect(latestVaultState?.recoverySalt).toBe("r2");
+    expect(latestVaultState?.recoveryIv).toBe("r3");
+  });
 });
