@@ -1,39 +1,144 @@
-/**
- * Hushh Research Monorepo - Local Workspace Encryption Compliance Preflight
- * * Audits local data structures to ensure local sandbox development files follow
- * secure, zero-knowledge naming conventions and cryptographic guardrails.
- */
-const fs = require('fs');
-const path = require('path');
+#!/usr/bin/env node
 
-console.log('\x1b[35m%s\x1b[0m', '🔒 Auditing local workspace sandbox for data encryption compliance...');
+const fs = require("node:fs");
+const path = require("node:path");
 
-// Define a list of raw, non-compliant data file patterns we want to flag if left unencrypted in scratchpads
-const PLAINTEXT_EXTENSIONS = ['.raw_sql', '.unencrypted_log', '.cleartext_pkm'];
-const dataScratchpadPath = path.resolve(__dirname, '../data');
+const DEFAULT_SCAN_ROOTS = [
+  "data",
+  "tests/fixtures",
+  "consent-protocol/tests/fixtures",
+  "hushh-webapp/__tests__/fixtures",
+];
 
-let nonCompliantFilesFound = 0;
+const PLAINTEXT_EXTENSIONS = new Set([
+  ".raw_sql",
+  ".unencrypted_log",
+  ".cleartext_pkm",
+]);
 
-if (fs.existsSync(dataScratchpadPath)) {
-    try {
-        const files = fs.readdirSync(dataScratchpadPath);
-        files.forEach(file => {
-            const ext = path.extname(file);
-            if (PLAINTEXT_EXTENSIONS.includes(ext)) {
-                console.log('\x1b[31m%s\x1b[0m', `⚠️  Non-Compliant Data Asset Detected: '${file}'`);
-                console.log(`   Action: Wrap this data payload using Hushh Zero-Knowledge architecture or secure encryption envelopes.`);
-                nonCompliantFilesFound++;
-            }
-        });
-    } catch (err) {
-        // Safe fallback if directory cannot be read
+const MOCK_DATABASE_EXTENSIONS = new Set([
+  ".db",
+  ".sqlite",
+  ".sqlite3",
+]);
+
+const PROTECTED_NAME_PATTERN =
+  /(?:^|[-_.])(encrypted|cipher|ciphertext|vault|pkm|zk|zero[-_.]?knowledge)(?:[-_.]|$)/i;
+
+function normalize(relativePath) {
+  return relativePath.replace(/\\/g, "/");
+}
+
+function listFiles(rootPath) {
+  if (!fs.existsSync(rootPath)) return [];
+
+  const stat = fs.statSync(rootPath);
+  if (stat.isFile()) return [rootPath];
+
+  const files = [];
+  const visit = (dir) => {
+    for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
+      const fullPath = path.join(dir, entry.name);
+      if (entry.isDirectory()) {
+        visit(fullPath);
+      } else if (entry.isFile()) {
+        files.push(fullPath);
+      }
     }
+  };
+
+  visit(rootPath);
+  return files;
 }
 
-if (nonCompliantFilesFound === 0) {
-    console.log('\x1b[32m%s\x1b[0m', '✅ Compliance Check Passed: Local sandbox development space is fully aligned with zero-knowledge data protocols!');
-} else {
-    console.log('\x1b[33m%s\x1b[0m', `\n⚠️  Preflight found ${nonCompliantFilesFound} security optimization opportunities. Please check data structures before deployment.`);
+function hasProtectedName(filePath) {
+  return PROTECTED_NAME_PATTERN.test(path.basename(filePath));
 }
 
-process.exit(0);
+function classifyFile(filePath) {
+  const lowerName = path.basename(filePath).toLowerCase();
+
+  for (const extension of PLAINTEXT_EXTENSIONS) {
+    if (lowerName.endsWith(extension)) {
+      return {
+        ok: false,
+        reason: `plaintext scratchpad extension ${extension}`,
+      };
+    }
+  }
+
+  for (const extension of MOCK_DATABASE_EXTENSIONS) {
+    if (lowerName.endsWith(extension) && !hasProtectedName(filePath)) {
+      return {
+        ok: false,
+        reason: `unprotected mock database extension ${extension}`,
+      };
+    }
+  }
+
+  return { ok: true, reason: "" };
+}
+
+function runComplianceCheck(options = {}) {
+  const workspaceRoot = path.resolve(options.workspaceRoot || path.join(__dirname, ".."));
+  const scanRoots = options.scanRoots || DEFAULT_SCAN_ROOTS;
+  const findings = [];
+  let scannedFiles = 0;
+
+  for (const scanRoot of scanRoots) {
+    const absoluteRoot = path.resolve(workspaceRoot, scanRoot);
+    for (const filePath of listFiles(absoluteRoot)) {
+      scannedFiles += 1;
+      const classification = classifyFile(filePath);
+      if (!classification.ok) {
+        findings.push({
+          path: normalize(path.relative(workspaceRoot, filePath)),
+          reason: classification.reason,
+        });
+      }
+    }
+  }
+
+  return {
+    ok: findings.length === 0,
+    findings,
+    scannedFiles,
+    scanRoots,
+    workspaceRoot,
+  };
+}
+
+function printResult(result) {
+  console.log("Hushh encryption compliance preflight");
+  console.log(`Scanned ${result.scannedFiles} local data/test file(s).`);
+
+  if (result.ok) {
+    console.log(
+      "Compliance check passed: local sandbox data follows zero-knowledge naming guardrails."
+    );
+    return;
+  }
+
+  console.error("Compliance check failed: unprotected local data footprint(s) detected.");
+  for (const finding of result.findings) {
+    console.error(`  - ${finding.path} (${finding.reason})`);
+  }
+  console.error(
+    "Action: encrypt the fixture, rename it with an encrypted/vault/pkm/zk marker, or remove the plaintext scratchpad."
+  );
+}
+
+function main() {
+  const result = runComplianceCheck();
+  printResult(result);
+  process.exit(result.ok ? 0 : 1);
+}
+
+if (require.main === module) {
+  main();
+}
+
+module.exports = {
+  classifyFile,
+  runComplianceCheck,
+};
