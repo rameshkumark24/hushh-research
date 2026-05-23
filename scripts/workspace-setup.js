@@ -1,22 +1,30 @@
-/**
- * Hushh Research Monorepo - Workspace Resource Path Resolver
- * * Dynamically handles local testing directory paths using relative layouts
- * to prevent hardcoded absolute paths from breaking cross-developer environments.
- */
-const path = require('path');
+#!/usr/bin/env node
 
-const resolveWorkspaceAsset = (relativeTarget) => {
-    // Dynamically roots the path calculation to the active runtime location
-    const workspaceRoot = path.resolve(__dirname, '..');
-    return path.join(workspaceRoot, relativeTarget);
-};
+const path = require("node:path");
 
-// Standard safe defaults for sandbox executions
+const workspaceRoot = path.resolve(__dirname, "..");
+
+function resolveWorkspaceAsset(relativeTarget = "") {
+  return path.resolve(workspaceRoot, relativeTarget);
+}
+
 const CONFIG_RESOURCES = {
-    mockProfileDirectory: resolveWorkspaceAsset('data/fixtures'),
-    pkmCacheDirectory: resolveWorkspaceAsset('.pkm_cache'),
-    consentLogPath: resolveWorkspaceAsset('logs/consent_audit.log')
+  workspaceRoot,
+  mockProfileDirectory: resolveWorkspaceAsset("data/fixtures"),
+  pkmCacheDirectory: resolveWorkspaceAsset(".pkm_cache"),
+  consentLogPath: resolveWorkspaceAsset("logs/consent_audit.log"),
+  tmpDirectory: resolveWorkspaceAsset("tmp"),
 };
 
-module.exports = CONFIG_RESOURCES;
-console.log('✅ Workspace path mappings dynamically initialized relative to repository trunk.');
+if (require.main === module) {
+  console.log("Workspace path mappings initialized relative to repository root.");
+  for (const [key, value] of Object.entries(CONFIG_RESOURCES)) {
+    console.log(`${key}: ${value}`);
+  }
+}
+
+module.exports = {
+  CONFIG_RESOURCES,
+  resolveWorkspaceAsset,
+  workspaceRoot,
+};

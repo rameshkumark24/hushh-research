@@ -8,4 +8,5 @@ node scripts/verify-doc-runtime-parity.cjs
 node scripts/verify-doc-links.cjs
 node scripts/verify-doc-governance.cjs
 node scripts/verify-doc-brand.cjs
+node scripts/workspace-setup-smoke.js
 node scripts/verify-shareable-links.cjs
