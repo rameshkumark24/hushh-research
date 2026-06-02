@@ -77,9 +77,6 @@ reported to the community leaders responsible for enforcement at:
 * **Email**: eng@hush1one.com
 * **Discord**: Contact a moderator in the #support channel
 
-Security or privacy vulnerabilities must follow [SECURITY.md](./SECURITY.md);
-do not post sensitive details in a public thread.
-
 All complaints will be reviewed and investigated promptly and fairly.
 
 All community leaders are obligated to respect the privacy and security of the
