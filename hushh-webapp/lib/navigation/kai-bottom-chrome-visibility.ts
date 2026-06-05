@@ -47,7 +47,7 @@ function emit() {
 
 function cancelAnimation() {
   if (typeof window === "undefined" || state.rafId === null) return;
-  window.cancelAnimationFrame(state.rafId);
+  cancelAnimationFrame(state.rafId);
   state.rafId = null;
   state.lastFrameTs = null;
 }
@@ -77,7 +77,7 @@ function animateProgress(ts: number) {
     emit();
   }
 
-  state.rafId = window.requestAnimationFrame(animateProgress);
+  state.rafId = requestAnimationFrame(animateProgress);
 }
 
 function setTargetProgress(nextTarget: number) {
@@ -99,7 +99,7 @@ function setTargetProgress(nextTarget: number) {
 
   if (typeof window !== "undefined" && state.rafId === null) {
     state.lastFrameTs = null;
-    state.rafId = window.requestAnimationFrame(animateProgress);
+    state.rafId = requestAnimationFrame(animateProgress);
   }
 }
 
