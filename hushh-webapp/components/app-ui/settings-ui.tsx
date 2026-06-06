@@ -390,7 +390,7 @@ export function SettingsDetailPanel({
   const isMobile = useIsMobile();
   if (isMobile) {
     return (
-      <Drawer open={open} onOpenChange={onOpenChange}>
+      <Drawer open={open} onOpenChange={onOpenChange} modal>
         <DrawerContent
           className="h-[100dvh] max-h-[100dvh] rounded-none border-none bg-[color:var(--app-card-surface-default-solid)] shadow-[var(--app-card-shadow-feature)]"
           onOpenAutoFocus={(e) => {
