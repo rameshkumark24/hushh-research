@@ -409,6 +409,7 @@ function LiquidGlassSearchBar({
             <input
               ref={inputRef}
               type="search"
+              autoComplete="off"
               spellCheck={false}
               autoCorrect="off"
               autoCapitalize="off"
