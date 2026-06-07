@@ -61,7 +61,24 @@ describe("portfolio normalize helpers", () => {
     expect(normalized.holdings[0].market_value).toBe(800);
     expect(normalized.holdings[0].quantity).toBe(3);
   });
-       it("drops empty symbol holdings during consolidation", () => {
+       it("parses formatted currency strings and parenthesized negatives in numeric fields", () => {
+    const consolidated = consolidateHoldingsBySymbol([
+      {
+        symbol: "msft",
+        name: "Microsoft",
+        quantity: "10",
+        market_value: "$1,200.50",
+        cost_basis: "(200)",
+      },
+    ]);
+
+    expect(consolidated).toHaveLength(1);
+    expect(consolidated[0].quantity).toBe(10);
+    expect(consolidated[0].market_value).toBe(1200.5);
+    expect(consolidated[0].cost_basis).toBe(-200);
+  });
+
+  it("drops empty symbol holdings during consolidation", () => {
     const consolidated = consolidateHoldingsBySymbol([
       {
         symbol: "",
