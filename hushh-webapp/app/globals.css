@@ -44,6 +44,11 @@ html body[data-scroll-locked] {
   margin-right: 0 !important;
 }
 
+/* Eliminate 300ms tap delay globally on mobile */
+a, button, input, select, textarea {
+  touch-action: manipulation;
+}
+
 [data-app-scroll-root="true"][data-app-scroll-mode="hidden-shell"] {
   overflow-y: auto;
   overflow-x: hidden;
