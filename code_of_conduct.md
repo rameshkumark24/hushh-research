@@ -43,7 +43,7 @@ ourselves to additional standards:
 
 * **Respect user privacy** - Never share or expose user data, even in examples
 * **Consent is paramount** - All features must honor the consent-first principle
-* **Security-conscious** - Report security issues privately via security.md
+* **Security-conscious** - Report security issues privately via [SECURITY.md](./SECURITY.md)
 * **BYOK compliance** - Never suggest storing encryption keys on servers
 
 ## Enforcement Responsibilities
