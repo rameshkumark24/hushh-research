@@ -51,6 +51,7 @@ import {
 import { Button } from "@/lib/morphy-ux/button";
 import { format } from "date-fns";
 import { HushhLoader } from "@/components/app-ui/hushh-loader";
+import { DashboardEmptyState } from "@/components/app-ui/dashboard-empty-state";
 import { PersonalKnowledgeModelService } from "@/lib/services/personal-knowledge-model-service";
 import { CacheService, CACHE_KEYS } from "@/lib/services/cache-service";
 import { mapPortfolioToDashboardViewModel } from "@/components/kai/views/dashboard-data-mapper";
@@ -549,18 +550,16 @@ function removeTickerFromHistoryMap(
 
 function EmptyState() {
   return (
-    <div className="flex flex-col items-center justify-center py-12 px-4 space-y-6">
-      <div className="p-4 rounded-full bg-primary/5 border border-primary/10">
-        <Icon icon={BarChart3} size={32} className="text-primary/60" aria-hidden="true" />
-      </div>
-      <div className="text-center space-y-2 max-w-sm">
-        <h3 className="text-lg font-semibold">No analyses yet</h3>
-        <p className="text-sm text-muted-foreground leading-relaxed">
-          Search for a stock ticker below and let Agent Kai&apos;s multi-agent
-          debate engine give you a data-driven recommendation.
-        </p>
-      </div>
-    </div>
+    <DashboardEmptyState
+      icon={BarChart3}
+      title="No analyses yet"
+      description={
+        <>
+          Search for a stock ticker below and let Agent Kai&apos;s multi-agent debate engine give
+          you a data-driven recommendation.
+        </>
+      }
+    />
   );
 }
 

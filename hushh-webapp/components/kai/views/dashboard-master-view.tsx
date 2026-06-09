@@ -18,6 +18,7 @@ import {
 import { toast } from "sonner";
 
 import { PageHeader } from "@/components/app-ui/page-sections";
+import { DashboardEmptyState } from "@/components/app-ui/dashboard-empty-state";
 import {
   ChartSurfaceCard,
   FallbackSurfaceCard,
@@ -2649,27 +2650,34 @@ export function DashboardMasterView({
           isDeletingStatementSnapshot={isDeletingStatementSnapshot}
         />
         <SurfaceCard>
-          <SurfaceCardContent className="space-y-3 p-6">
-            <p className="text-sm font-semibold">No active portfolio source is ready yet.</p>
-            <p className="text-sm text-muted-foreground">
-              Import a statement for an editable source, or connect Plaid for read-only brokerage data.
-            </p>
-            {plaidConfigured !== false ? (
-              <div className="flex flex-wrap gap-2">
-                <MorphyButton
-                  variant="blue-gradient"
-                  effect="fill"
-                  onClick={() => void openPlaidLinkFlow()}
-                  disabled={isLinkingPlaid}
-                >
-                  {isLinkingPlaid ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Building2 className="mr-2 h-4 w-4" />}
-                  Connect Plaid
-                </MorphyButton>
-                <MorphyButton variant="none" effect="fade" onClick={onReupload}>
-                  Upload Statement
-                </MorphyButton>
-              </div>
-            ) : null}
+          <SurfaceCardContent className="p-4 sm:p-5">
+            <DashboardEmptyState
+              icon={Building2}
+              title="No active portfolio source is ready yet."
+              description="Import a statement for an editable source, or connect Plaid for read-only brokerage data."
+              actions={
+                plaidConfigured !== false ? (
+                  <div className="flex flex-wrap justify-center gap-2">
+                    <MorphyButton
+                      variant="blue-gradient"
+                      effect="fill"
+                      onClick={() => void openPlaidLinkFlow()}
+                      disabled={isLinkingPlaid}
+                    >
+                      {isLinkingPlaid ? (
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      ) : (
+                        <Building2 className="mr-2 h-4 w-4" />
+                      )}
+                      Connect Plaid
+                    </MorphyButton>
+                    <MorphyButton variant="none" effect="fade" onClick={onReupload}>
+                      Upload Statement
+                    </MorphyButton>
+                  </div>
+                ) : null
+              }
+            />
           </SurfaceCardContent>
         </SurfaceCard>
         {deletePortfolioDialog}

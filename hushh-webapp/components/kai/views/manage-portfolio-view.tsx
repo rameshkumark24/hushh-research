@@ -45,6 +45,7 @@ import { CacheSyncService } from "@/lib/cache/cache-sync-service";
 import { EditHoldingModal } from "@/components/kai/modals/edit-holding-modal";
 import { useKaiSession } from "@/lib/stores/kai-session-store";
 import { ROUTES } from "@/lib/navigation/routes";
+import { DashboardEmptyState } from "@/components/app-ui/dashboard-empty-state";
 
 // =============================================================================
 // TYPES
@@ -719,13 +720,17 @@ export function ManagePortfolioView() {
               </>
             ) : (
               <Card variant="muted" effect="glass" showRipple={false}>
-                <CardContent className="p-8 text-center">
-                  <p className="text-muted-foreground mb-4">
-                    No holdings yet. Add your first holding or import a portfolio statement.
-                  </p>
-                  <Button onClick={handleAddHolding} icon={{ icon: Plus, gradient: false }}>
-                    Add Holding
-                  </Button>
+                <CardContent className="p-4 sm:p-5">
+                  <DashboardEmptyState
+                    icon={Plus}
+                    title="No holdings yet"
+                    description="Add your first holding or import a portfolio statement."
+                    actions={
+                      <Button onClick={handleAddHolding} icon={{ icon: Plus, gradient: false }}>
+                        Add Holding
+                      </Button>
+                    }
+                  />
                 </CardContent>
               </Card>
             )}
