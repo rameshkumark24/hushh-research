@@ -303,7 +303,7 @@ export function SettingsRow({
             />
           </button>
           {trailingContent ? (
-            <div onClick={(e) => e.stopPropagation()}>
+            <div role="presentation" onClick={(e) => e.stopPropagation()}>
               {trailingContent}
             </div>
           ) : null}
