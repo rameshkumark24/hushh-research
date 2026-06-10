@@ -263,7 +263,7 @@ export function PlaidBrokerageSummarySection({
 
             <div className="flex flex-wrap gap-2">
               {connectionHealth(selectedItem).isRefreshing ? (
-                <Button
+                <Button type="button"
                   variant="none"
                   effect="fade"
                   onClick={() =>
@@ -279,7 +279,7 @@ export function PlaidBrokerageSummarySection({
                   Cancel refresh
                 </Button>
               ) : (
-                <Button
+                <Button type="button"
                   variant="none"
                   effect="fade"
                   onClick={() => void onRefreshItem?.(selectedItem.item_id)}
@@ -288,7 +288,7 @@ export function PlaidBrokerageSummarySection({
                   Refresh
                 </Button>
               )}
-              <Button
+              <Button type="button"
                 variant="none"
                 effect="fade"
                 onClick={() => void onManageConnection?.(selectedItem.item_id)}
@@ -297,7 +297,7 @@ export function PlaidBrokerageSummarySection({
                 Manage connection
               </Button>
               {onViewInvestments ? (
-                <Button variant="none" effect="fade" onClick={onViewInvestments}>
+                <Button type="button" variant="none" effect="fade" onClick={onViewInvestments}>
                   <ExternalLink className="mr-2 h-4 w-4" />
                   View investments
                 </Button>
@@ -675,7 +675,7 @@ export function PlaidFundingTransfersSection({
         trailing={
           <div className="flex flex-wrap items-center gap-2">
             {onRunReconciliation ? (
-              <Button
+              <Button type="button"
                 variant="none"
                 effect="fade"
                 disabled={isReconciling}
@@ -689,7 +689,7 @@ export function PlaidFundingTransfersSection({
                 Reconcile
               </Button>
             ) : null}
-            <Button
+            <Button type="button"
               variant="none"
               effect="fade"
               disabled={isConnectingFunding}
@@ -708,7 +708,7 @@ export function PlaidFundingTransfersSection({
 
       {fundingItem && fundingAccounts.length > 0 && onCreateTransfer ? (
         <div className="space-y-2">
-          <Button
+          <Button type="button"
             variant="none"
             effect="fade"
             size="sm"
@@ -772,7 +772,7 @@ export function PlaidFundingTransfersSection({
                       account before creating transfers.
                     </p>
                     {onManageBrokerage ? (
-                      <Button
+                      <Button type="button"
                         variant="none"
                         effect="fade"
                         size="sm"
@@ -809,7 +809,7 @@ export function PlaidFundingTransfersSection({
                   />
                   <div className="flex gap-2 pt-1">
                     {["100.00", "250.00", "500.00"].map((preset) => (
-                      <Button
+                      <Button type="button"
                         key={preset}
                         variant="none"
                         effect="fade"
@@ -866,7 +866,7 @@ export function PlaidFundingTransfersSection({
                 ) : null}
               </div>
               <div className="mt-3 flex flex-wrap gap-2">
-                <Button
+                <Button type="button"
                   variant="none"
                   effect="fade"
                   disabled={isSubmittingTransfer || !relationshipApproved}
@@ -947,7 +947,7 @@ export function PlaidFundingTransfersSection({
                       {transferStatus || "pending"}
                     </Badge>
                     {transferId && onRefreshTransfer ? (
-                      <Button
+                      <Button type="button"
                         variant="none"
                         effect="fade"
                         size="sm"
@@ -957,7 +957,7 @@ export function PlaidFundingTransfersSection({
                       </Button>
                     ) : null}
                     {transferId && onCancelTransfer ? (
-                      <Button
+                      <Button type="button"
                         variant="none"
                         effect="fade"
                         size="sm"
@@ -1031,7 +1031,7 @@ export function PlaidFundingTransfersSection({
 
           <div className="mt-3 flex flex-wrap gap-2">
             {onSearchFundingRecords ? (
-              <Button
+              <Button type="button"
                 variant="none"
                 effect="fade"
                 disabled={isSearchingSupport}
@@ -1046,7 +1046,7 @@ export function PlaidFundingTransfersSection({
               </Button>
             ) : null}
             {onCreateFundingEscalation ? (
-              <Button
+              <Button type="button"
                 variant="none"
                 effect="fade"
                 disabled={isEscalatingSupport || !supportNotes.trim()}
