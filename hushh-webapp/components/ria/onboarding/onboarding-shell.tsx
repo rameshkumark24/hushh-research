@@ -49,7 +49,10 @@ export function OnboardingShell({
             <ArrowLeft className="h-5 w-5" />
           </button>
 
-          <span className="inline-flex items-center rounded-full border border-border/60 bg-card/70 px-3 py-1 text-xs font-medium tabular-nums text-muted-foreground shadow-[0_8px_24px_rgba(15,23,42,0.06)] backdrop-blur dark:bg-card/45 dark:shadow-none">
+          <span
+            aria-label={`Step ${currentStepIndex + 1} of ${totalSteps}`}
+            className="inline-flex items-center rounded-full border border-border/60 bg-card/70 px-3 py-1 text-xs font-medium tabular-nums text-muted-foreground shadow-[0_8px_24px_rgba(15,23,42,0.06)] backdrop-blur dark:bg-card/45 dark:shadow-none"
+          >
             {currentStepIndex + 1} / {totalSteps}
           </span>
         </div>
