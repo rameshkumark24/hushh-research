@@ -5,9 +5,15 @@ Consent Database Service
 
 Service layer for consent-related database operations.
 
+Canonical attach point:
+  hushh_mcp.services.consent_db.ConsentDBService -> multiple consent routes
+
 CONSENT-FIRST ARCHITECTURE:
     All consent operations go through this service.
     Provides methods for pending requests, active tokens, and audit logs.
+
+All timestamps use timezone-aware datetime.now(tz=timezone.utc) to avoid
+ambiguous local-time values when the server runs in a non-UTC environment.
 
 Usage:
     from hushh_mcp.services.consent_db import ConsentDBService
@@ -30,6 +36,7 @@ Usage:
     )
 """
 
+import hashlib
 import json
 import logging
 from datetime import datetime, timezone
@@ -41,6 +48,11 @@ from hushh_mcp.consent.scope_helpers import scope_matches
 from hushh_mcp.services.consent_request_links import build_consent_request_url
 
 logger = logging.getLogger(__name__)
+
+
+def _token_fingerprint(token: str) -> str:
+    """Return a 12-char SHA-256 fingerprint for safe log messages."""
+    return hashlib.sha256(token.encode()).hexdigest()[:12]
 
 
 class ConsentDBService:
@@ -420,7 +432,7 @@ class ConsentDBService:
         since Supabase REST API doesn't support complex SQL.
         """
         supabase = self._get_supabase()
-        now_ms = int(datetime.now().timestamp() * 1000)
+        now_ms = int(datetime.now(tz=timezone.utc).timestamp() * 1000)
 
         # Fetch all relevant rows (we'll filter in Python)
         # Note: Cannot use .neq("request_id", None) - SQL "!= NULL" is always NULL (not true)
@@ -564,7 +576,7 @@ class ConsentDBService:
         query = self._filter_user_id_query(query, user_id, user_ids)
         response = query.order("issued_at", desc=True).execute()
 
-        now_ms = int(datetime.now().timestamp() * 1000)
+        now_ms = int(datetime.now(tz=timezone.utc).timestamp() * 1000)
         matched_row: Dict[str, Any] | None = None
         for row in response.data or []:
             if not self._is_external_audit_row(row):
@@ -620,7 +632,7 @@ class ConsentDBService:
     ) -> Optional[Dict]:
         """Return the newest still-pending exact request for one agent+scope."""
         supabase = self._get_supabase()
-        now_ms = int(datetime.now().timestamp() * 1000)
+        now_ms = int(datetime.now(tz=timezone.utc).timestamp() * 1000)
 
         response = (
             supabase.table("consent_audit")
@@ -679,7 +691,7 @@ class ConsentDBService:
         Uniqueness is keyed by (agent_id, scope), not just scope.
         """
         supabase = self._get_supabase()
-        now_ms = int(datetime.now().timestamp() * 1000)
+        now_ms = int(datetime.now(tz=timezone.utc).timestamp() * 1000)
 
         # Fetch all CONSENT_GRANTED and REVOKED actions
         query = supabase.table("consent_audit").select("*")
@@ -814,7 +826,7 @@ class ConsentDBService:
         scope: Optional[str] = None,
     ) -> List[Dict]:
         """Get active internal/self tokens without exposing them to the external consent ledger."""
-        now_ms = int(datetime.now().timestamp() * 1000)
+        now_ms = int(datetime.now(tz=timezone.utc).timestamp() * 1000)
         try:
             supabase = self._get_supabase()
             response_data = (
@@ -886,7 +898,7 @@ class ConsentDBService:
         self, user_id: str, scope: str, agent_id: Optional[str] = None
     ) -> bool:
         """Check if there's an active token for user+scope (+agent_id when provided)."""
-        now_ms = int(datetime.now().timestamp() * 1000)
+        now_ms = int(datetime.now(tz=timezone.utc).timestamp() * 1000)
         normalized_scope = str(scope or "").strip()
         normalized_agent_id = agent_id or None
         is_internal_lookup = self._is_internal_event(
@@ -960,7 +972,7 @@ class ConsentDBService:
         which would cause duplicate toast notifications.
         """
         supabase = self._get_supabase()
-        now_ms = int(datetime.now().timestamp() * 1000)
+        now_ms = int(datetime.now(tz=timezone.utc).timestamp() * 1000)
         cooldown_ms = cooldown_seconds * 1000
         cutoff_ms = now_ms - cooldown_ms
 
@@ -994,7 +1006,7 @@ class ConsentDBService:
         """Get paginated audit log for a user."""
         supabase = self._get_supabase()
         offset = (page - 1) * limit
-        now_ms = int(datetime.now().timestamp() * 1000)
+        now_ms = int(datetime.now(tz=timezone.utc).timestamp() * 1000)
 
         # Get paginated results (TableQuery uses .limit/.offset, not .range)
         query = supabase.table("consent_audit").select("*")
@@ -1046,7 +1058,7 @@ class ConsentDBService:
 
     async def get_internal_activity_summary(self, user_id: str, limit: int = 8) -> Dict[str, Any]:
         """Return a small self/internal activity summary for a separate investor-facing surface."""
-        now_ms = int(datetime.now().timestamp() * 1000)
+        now_ms = int(datetime.now(tz=timezone.utc).timestamp() * 1000)
         day_cutoff_ms = now_ms - (24 * 60 * 60 * 1000)
         try:
             supabase = self._get_supabase()
@@ -1215,7 +1227,7 @@ class ConsentDBService:
 
         supabase = self._get_supabase()
 
-        issued_at = int(datetime.now().timestamp() * 1000)
+        issued_at = int(datetime.now(tz=timezone.utc).timestamp() * 1000)
         token_id = token_id or f"evt_{issued_at}"
 
         # Prepare metadata as JSON string
@@ -1266,7 +1278,7 @@ class ConsentDBService:
     ) -> int:
         """Insert an internal/self activity event into the internal ledger."""
         supabase = self._get_supabase()
-        issued_at = int(datetime.now().timestamp() * 1000)
+        issued_at = int(datetime.now(tz=timezone.utc).timestamp() * 1000)
         token_id = token_id or f"evt_{issued_at}"
         metadata_json = json.dumps(metadata) if metadata else None
 
@@ -1311,7 +1323,7 @@ class ConsentDBService:
         Used by the optional timeout job to emit TIMEOUT events over SSE.
         """
         supabase = self._get_supabase()
-        now_ms = int(datetime.now().timestamp() * 1000)
+        now_ms = int(datetime.now(tz=timezone.utc).timestamp() * 1000)
         response = (
             supabase.table("consent_audit")
             .select(
@@ -1441,7 +1453,7 @@ class ConsentDBService:
     async def get_pending_notification_candidates(self) -> List[Dict[str, Any]]:
         """Return latest pending requests with enough metadata for reminder scheduling."""
         supabase = self._get_supabase()
-        now_ms = int(datetime.now().timestamp() * 1000)
+        now_ms = int(datetime.now(tz=timezone.utc).timestamp() * 1000)
         response = (
             supabase.table("consent_audit").select("*").order("issued_at", desc=True).execute()
         )
@@ -1701,8 +1713,8 @@ class ConsentDBService:
         normalized_bundle = self._normalize_wrapped_key_bundle(wrapped_key_bundle)
         if normalized_bundle is None:
             logger.error(
-                "Refusing to store consent export without a wrapped key bundle token=%s",
-                consent_token[:30],
+                "Refusing to store consent export without a wrapped key bundle token_fp=%s",
+                _token_fingerprint(consent_token),
             )
             return False
 
@@ -1731,7 +1743,7 @@ class ConsentDBService:
                 on_conflict="consent_token",
             ).execute()
 
-            logger.info(f"Stored consent export for token: {consent_token[:30]}...")
+            logger.info("Stored consent export for token_fp=%s", _token_fingerprint(consent_token))
             return True
         except Exception as e:
             logger.error(f"Failed to store consent export: {e}")
@@ -1811,7 +1823,7 @@ class ConsentDBService:
         try:
             supabase.table("consent_exports").delete().eq("consent_token", consent_token).execute()
 
-            logger.info(f"Deleted consent export for token: {consent_token[:30]}...")
+            logger.info("Deleted consent export for token_fp=%s", _token_fingerprint(consent_token))
             return True
         except Exception as e:
             logger.error(f"Failed to delete consent export: {e}")
@@ -1834,7 +1846,7 @@ class ConsentDBService:
             logger.warning("Failed to add legacy token to in-memory revoke set: %s", token_id)
 
         await self.delete_consent_export(token_id)
-        revoke_event_token = f"REVOKED_LEGACY_{int(datetime.now().timestamp() * 1000)}"
+        revoke_event_token = f"REVOKED_LEGACY_{int(datetime.now(tz=timezone.utc).timestamp() * 1000)}"
         metadata = {
             "legacy_export_invalidated": True,
             "reason": reason,
