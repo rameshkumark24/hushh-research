@@ -107,7 +107,7 @@ a, button, input, select, textarea {
    * Next/font sets these variables at runtime from app/layout.tsx.
    * Keep names semantic so future font swaps only need layout.tsx changes. */
   --font-app-body: system-ui, sans-serif;
-  --font-app-heading: system-ui, sans-serif;
+  --font-app-heading: Inter, "Inter Fallback", system-ui, sans-serif;
   --font-app-mono: ui-monospace, monospace;
 
   /* Runtime CSS variable fallbacks for dynamic primitives/charts. */
