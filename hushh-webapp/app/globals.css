@@ -1014,6 +1014,15 @@ html.native-ios {
     letter-spacing: -0.012em;
   }
 
+  .app-page-shell h1,
+  .app-page-shell [role="heading"][aria-level="1"] {
+    font-family: var(--font-sans), system-ui, sans-serif;
+    font-size: clamp(1.9rem, 4.8vw, 2rem) !important;
+    line-height: 1.08 !important;
+    font-weight: 600 !important;
+    letter-spacing: 0 !important;
+  }
+
   /* Global Lucide icon stroke thickness (lucide-react adds `.lucide` on the SVG). */
   .lucide {
     stroke-width: var(--lucide-stroke-width);
