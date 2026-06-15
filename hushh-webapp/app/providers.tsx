@@ -240,7 +240,7 @@ export function Providers({ children }: ProvidersProps) {
   }, [routeLayoutMode, signedInShellContentOffset.mode, signedInShellContentOffset.style, topShellRouteProfile.id, topShellRouteStyle]);
 
   return (
-    <ThemeProvider attribute="class" defaultTheme="dark" enableSystem>
+    <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
       <ObservabilityRouteObserver />
       <StepProgressProvider>
         <StatusBarManager />
