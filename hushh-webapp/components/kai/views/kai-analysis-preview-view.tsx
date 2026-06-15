@@ -5,6 +5,7 @@ import {
   BarChart3,
   Bell,
   ChevronRight,
+  CirclePlus,
   Compass,
   LineChart,
   MessageCircle,
@@ -12,7 +13,6 @@ import {
   PieChart,
   Search,
   Shield,
-  Sparkles,
   Star,
   Store,
   TrendingUp,
@@ -346,8 +346,8 @@ function AnalysisDock({ onKaiOpen }: { onKaiOpen: () => void }) {
   };
 
   return (
-    <div className="pointer-events-none fixed inset-x-0 bottom-0 z-30 mx-auto flex w-full max-w-[440px] flex-col gap-2.5 px-2.5 pb-[calc(10px+env(safe-area-inset-bottom))] before:pointer-events-none before:absolute before:inset-x-[-18px] before:bottom-[-10px] before:h-[126px] before:bg-[linear-gradient(180deg,rgba(255,255,255,0),rgba(255,255,255,0.88)_34%,rgba(255,255,255,0.98))] before:backdrop-blur-[8px] [&>*]:relative [&>*]:z-[1]">
-      <div className="flex items-end gap-2">
+    <div className="pointer-events-none fixed inset-x-0 bottom-0 z-30 mx-auto w-full max-w-[560px] px-4 pb-[calc(10px+env(safe-area-inset-bottom))] sm:px-6 before:pointer-events-none before:absolute before:inset-x-[-18px] before:bottom-[-10px] before:h-[126px] before:bg-[linear-gradient(180deg,rgba(255,255,255,0),rgba(255,255,255,0.88)_34%,rgba(255,255,255,0.98))] before:backdrop-blur-[8px] [&>*]:relative [&>*]:z-[1]">
+      <div className="relative flex items-end gap-2.5 sm:gap-3">
         {searchOpen ? (
           <>
             <form
@@ -410,17 +410,17 @@ function AnalysisDock({ onKaiOpen }: { onKaiOpen: () => void }) {
                 );
               })}
             </nav>
-            <div className="pointer-events-auto flex shrink-0 flex-col gap-2">
-              <button
-                type="button"
-                onClick={onKaiOpen}
-                className={cn(kaiPreviewDockSurfaceClassName, "grid h-[50px] w-[50px] place-items-center rounded-full")}
-                aria-label="Talk to Kai"
-              >
-                <span className="grid h-[30px] w-[30px] place-items-center rounded-[9px] bg-[color:var(--one-blue)] text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.35)]">
-                  <Sparkles className="h-[15px] w-[15px]" strokeWidth={1.8} />
-                </span>
-              </button>
+            <button
+              type="button"
+              onClick={onKaiOpen}
+              className={cn(kaiPreviewDockSurfaceClassName, "pointer-events-auto absolute bottom-[72px] right-1 grid h-[50px] w-[50px] place-items-center rounded-full")}
+              aria-label="Talk to Kai"
+            >
+              <span className="grid h-[30px] w-[30px] place-items-center rounded-[9px] bg-[color:var(--one-blue)] text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.35)]">
+                <CirclePlus className="h-[15px] w-[15px]" strokeWidth={2} />
+              </span>
+            </button>
+            <div className="pointer-events-auto flex shrink-0">
               <button
                 type="button"
                 onClick={() => setSearchOpen(true)}
