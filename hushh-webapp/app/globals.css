@@ -1016,7 +1016,7 @@ html.native-ios {
 
   .app-page-shell h1,
   .app-page-shell [role="heading"][aria-level="1"] {
-    font-family: var(--font-sans), system-ui, sans-serif;
+    font-family: var(--font-heading), var(--font-sans), system-ui, sans-serif;
     font-size: clamp(1.9rem, 4.8vw, 2rem) !important;
     line-height: 1.08 !important;
     font-weight: 600 !important;
